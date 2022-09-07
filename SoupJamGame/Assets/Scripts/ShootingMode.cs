@@ -13,12 +13,23 @@ public class ShootingMode : MonoBehaviour
     }
 
     [SerializeField] WeightedChance<Gunmode> GunModeChance;
-    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] Gunmode currentMode = Gunmode.SemiAuto;
 
-    Gunmode currentMode;
+    GameObject projectile;
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject rocketPrefab;
 
     float switchTimer;
+    float fireRate;
+    float bulletSpeed;
+    float bulletDamage;
+
+    bool shooting;
+    bool canShoot = true;
     bool modeswitched = true;
+
+    Vector2 dir;
+    Vector2 bulletVelocity;
 
     void Update()
     {
@@ -28,6 +39,13 @@ public class ShootingMode : MonoBehaviour
         }
 
         transform.parent.rotation = LookAt2D.LookAtMouse(transform.parent);
+
+        dir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position);
+
+        if (canShoot && shooting)
+            StartCoroutine(shootFullAuto());
+
+        print("Can shoot: " + canShoot);
     }
 
     public void Shoot()
@@ -49,26 +67,44 @@ public class ShootingMode : MonoBehaviour
             default:
                 break;
         }
+
+        if (canShoot)
+            StopCoroutine(shootFullAuto());
+
+        print("Started shooting");
+        shooting = true;
     }
 
     public void SemiAuto()
     {
-        GameObject bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+        bulletDamage = 2;
+        bulletSpeed = 15f;
+        fireRate = 0.3f;
+        projectile = bulletPrefab;
     }
 
     public void Inverted()
     {
-
+        bulletDamage = 2;
+        bulletSpeed = 15f;
+        fireRate = 0.5f;
+        projectile = bulletPrefab;
     }
 
     void Rifle()
     {
-
+        bulletDamage = 1;
+        bulletSpeed = 15f;
+        fireRate = 0.1f;
+        projectile = bulletPrefab;
     }
 
     void Launcher()
     {
-
+        bulletDamage = 5;
+        bulletSpeed = 10f;
+        fireRate = 1.5f;
+        projectile = rocketPrefab;
     }
 
     IEnumerator SwitchCountdown()
@@ -80,5 +116,44 @@ public class ShootingMode : MonoBehaviour
         currentMode = GunModeChance.GetRandomEntry();
         print("Current weapon mode: " + currentMode);
         modeswitched = true;
+    }
+
+    IEnumerator shootFullAuto()
+    {
+        canShoot = false;
+
+        GameObject bullet = Instantiate(projectile, transform.position, transform.rotation);
+
+        dir.Normalize();
+
+        switch (currentMode)
+        {
+            case Gunmode.SemiAuto:
+                bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
+                bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                break;
+            case Gunmode.Inverted:
+                bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed;
+                bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                break;
+            case Gunmode.Rifle:
+                bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
+                bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                break;
+            case Gunmode.Launcher:
+                bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed;
+                bullet.GetComponent<RocketScript>().damage = bulletDamage;
+                print("bullet dir: " + dir + " bulletSpeed: " + bulletSpeed);
+                break;
+        }
+
+        yield return new WaitForSeconds(fireRate);
+        canShoot = true;
+    }
+
+    public void StopShooting()
+    {
+        shooting = false;
+        print("Stopped shooting");
     }
 }

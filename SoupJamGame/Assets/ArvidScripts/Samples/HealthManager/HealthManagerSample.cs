@@ -6,7 +6,7 @@ using UnityEngine;
 public class HealthManagerSample : MonoBehaviour
 {
     [SerializeField] private float toHeal = 1f;
-    [SerializeField] private float toDamage = 1f;
+    [SerializeField] public float toDamage = 1f;
     
     private HealthManager health;
 
