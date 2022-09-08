@@ -10,6 +10,11 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField] Text scoreText;
 
+    [SerializeField] GameObject gun;
+    [SerializeField] PowerUps powerups;
+
+    Camera cam;
+
     bool canDmg = true;
 
     float playerScore;
@@ -17,12 +22,19 @@ public class PlayerScript : MonoBehaviour
     Vector3 cameraPos;
     Vector3 playerPos;
 
+    private void Start()
+    {
+        cam = Camera.main;
+    }
+
     private void Update()
     {
-        cameraPos = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, -10);
-        playerPos = new Vector3(transform.position.x, transform.position.y, -10);
+        FlipPlayer();
+    }
 
-        Camera.main.transform.position = Vector3.Lerp(cameraPos, playerPos, Time.deltaTime * 2f);
+    private void FixedUpdate()
+    {
+        CameraFollowPlayer();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -30,6 +42,12 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             GetComponent<HealthManager>().TakeDamage(damageTaken);
+        }
+        if (collision.gameObject.CompareTag("Powerup"))
+        {
+            powerups.ActivateBuff();
+            powerups.spawnPowerup = true;
+            Destroy(collision.gameObject);
         }
     }
 
@@ -58,6 +76,31 @@ public class PlayerScript : MonoBehaviour
 
     public void Die()
     {
-        UnityEditor.EditorApplication.isPlaying = false;
+        //UnityEditor.EditorApplication.isPlaying = false;
+        Application.Quit();
+    }
+
+    void CameraFollowPlayer()
+    {
+        /*QualitySettings.vSyncCount = 1;*/
+
+        cameraPos = new Vector3(cam.transform.position.x, cam.transform.position.y, -10);
+        playerPos = new Vector3(transform.position.x, transform.position.y, -10);
+
+        cam.transform.position = Vector3.Lerp(cameraPos, playerPos, Time.deltaTime * 2f);
+    }
+
+    void FlipPlayer()
+    {
+        if(cam.ScreenToWorldPoint(Input.mousePosition).x < transform.position.x)
+        {
+            GetComponent<SpriteRenderer>().flipX = true;
+            gun.GetComponent<SpriteRenderer>().flipY = true;
+        }
+        if (cam.ScreenToWorldPoint(Input.mousePosition).x > transform.position.x)
+        {
+            GetComponent<SpriteRenderer>().flipX = false;
+            gun.GetComponent<SpriteRenderer>().flipY = false;
+        }
     }
 }

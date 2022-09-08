@@ -80,6 +80,16 @@ public class ObjectSpawner : MonoBehaviour
     {
         GameObject obj = Instantiate(GetPrefab());
         obj.transform.SetPositionAndRotation(t.position, t.rotation);
+
+        if (obj.transform.position.x > -20 && obj.transform.position.x < 20 &&
+            obj.transform.position.y > -9.5f && obj.transform.position.y < 9.5f)
+        {
+            return;
+        }
+        else
+        {
+            Destroy(obj);
+        }
     }
 
     //---------------select prefab------------------

@@ -27,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4110943463158712035}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0.1, y: -0.15, z: 0}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 4110943464695097945}
@@ -75,8 +75,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.18867922, g: 0.18583123, b: 0.18583123, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 0f69592bdc21ec84397e3dffd24a23d8, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -108,7 +108,9 @@ MonoBehaviour:
       chance: 1
     - option: 3
       chance: 1
+  currentMode: 2
   bulletPrefab: {fileID: 2409260208127464456, guid: 06161cdc1764c40418a83bdf678c07b8, type: 3}
+  rocketPrefab: {fileID: 7313345236007509321, guid: b765aa8cbf998c5448cdc5321a787427, type: 3}
 --- !u!114 &4110943463158712039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,7 +145,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 4110943463158712033}
           m_TargetAssemblyTypeName: ShootingMode, Assembly-CSharp
-          m_MethodName: StopFullAuto
+          m_MethodName: StopShooting
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -171,6 +173,8 @@ GameObject:
   - component: {fileID: 4110943464695097951}
   - component: {fileID: 4110943464695097950}
   - component: {fileID: 6507546586017740798}
+  - component: {fileID: 526895771}
+  - component: {fileID: 526895772}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -235,7 +239,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f2204c99fd30bae4899f8cb2151e7eb7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -266,7 +270,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!114 &4110943464695097951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,6 +336,62 @@ CircleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.5}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.2
+--- !u!114 &526895771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4110943464695097947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 789a30404d06fac47a961c2802bf3a13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  healthBarMode: 2
+  hitOnDeath: 0
+  allowNegDamage: 0
+  allowNegHeal: 0
+  targetSlider: {fileID: 0}
+  targetTransform: {fileID: 0}
+  onHit:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 526895772}
+        m_TargetAssemblyTypeName: PlayerScript, Assembly-CSharp
+        m_MethodName: Die
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onHeal:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &526895772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4110943464695097947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8592f662c40ac22429749c0fdf8ce721, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damageTaken: 1
+  enemyDamageCD: 0.5
+  scoreText: {fileID: 0}
+  gun: {fileID: 4110943463158712035}

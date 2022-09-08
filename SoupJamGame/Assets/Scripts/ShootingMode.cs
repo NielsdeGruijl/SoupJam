@@ -24,12 +24,26 @@ public class ShootingMode : MonoBehaviour
     float bulletSpeed;
     float bulletDamage;
 
+    public float damageMultiplier = 1f;
+
+    float recoil;
+    float currentRecoil;
+
     bool shooting;
     bool canShoot = true;
     bool modeswitched = true;
 
     Vector2 dir;
     Vector2 bulletVelocity;
+    
+    Vector3 offsetPos;
+    Vector3 defaultPos;
+
+
+    private void Start()
+    {
+        defaultPos = transform.localPosition;
+    }
 
     void Update()
     {
@@ -38,12 +52,14 @@ public class ShootingMode : MonoBehaviour
             StartCoroutine(SwitchCountdown());
         }
 
-        transform.parent.rotation = LookAt2D.LookAtMouse(transform.parent);
+        transform.rotation = LookAt2D.LookAtMouse(transform.parent);
 
         dir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position);
 
         if (canShoot && shooting)
             StartCoroutine(shootFullAuto());
+
+        ApplyRecoil();
 
         print("Can shoot: " + canShoot);
     }
@@ -77,34 +93,38 @@ public class ShootingMode : MonoBehaviour
 
     public void SemiAuto()
     {
-        bulletDamage = 2;
+        bulletDamage = 2 * damageMultiplier;
         bulletSpeed = 15f;
         fireRate = 0.3f;
         projectile = bulletPrefab;
+        recoil = -0.5f;
     }
 
     public void Inverted()
     {
-        bulletDamage = 2;
+        bulletDamage = 2 * damageMultiplier;
         bulletSpeed = 15f;
         fireRate = 0.3f;
         projectile = bulletPrefab;
+        recoil = -0.1f;
     }
 
     void Rifle()
     {
-        bulletDamage = 1;
+        bulletDamage = 1 * damageMultiplier;
         bulletSpeed = 15f;
         fireRate = 0.1f;
         projectile = bulletPrefab;
+        recoil = -1f;
     }
 
     void Launcher()
     {
-        bulletDamage = 5;
+        bulletDamage = 5 * damageMultiplier;
         bulletSpeed = 10f;
         fireRate = 1.5f;
         projectile = rocketPrefab;
+        recoil = -1f;
     }
 
     IEnumerator SwitchCountdown()
@@ -136,27 +156,48 @@ public class ShootingMode : MonoBehaviour
                 bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                currentRecoil += recoil;
                 break;
             case Gunmode.Inverted:
                 bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed * -1f;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                currentRecoil += recoil;
                 break;
             case Gunmode.Rifle:
                 bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
+                currentRecoil += recoil;
                 break;
             case Gunmode.Launcher:
                 bullet = Instantiate(rocketPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed;
                 bullet.GetComponent<RocketScript>().damage = bulletDamage;
+                currentRecoil += recoil;
                 //print("bullet dir: " + dir + " bulletSpeed: " + bulletSpeed);
                 break;
         }
 
         yield return new WaitForSeconds(fireRate);
         canShoot = true;
+    }
+
+    void ApplyRecoil()
+    {
+        /*        if(currentRecoil < 0)
+                {
+                    print(currentRecoil);
+                    transform.localPosition = Vector2.Lerp(transform.localPosition, dir.normalized * currentRecoil, 0.5f);
+                    //transform.localPosition += new Vector3(dir.x, dir.y, 0).normalized * currentRecoil;
+                    currentRecoil -= Time.deltaTime;
+                }
+
+                if (transform.localPosition != defaultPos)
+                {
+                    transform.localPosition = Vector2.MoveTowards(transform.localPosition, defaultPos, currentRecoil * -1f);
+                    print("Default position: " + defaultPos + " localPosition: " + transform.localPosition);
+                }*/
     }
 
     public void StopShooting()

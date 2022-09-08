@@ -7,6 +7,9 @@ public class EnemyScript : MonoBehaviour
     Rigidbody2D rb;
     GameObject player;
 
+    HealthManager manager;
+    [SerializeField] EnemySpawner spawner;
+
     Vector2 dir;
 
     float speed = 1f;
@@ -17,6 +20,10 @@ public class EnemyScript : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
+        manager = GetComponent<HealthManager>();
+        spawner = GameObject.FindGameObjectWithTag("Spawner").GetComponent<EnemySpawner>();
+
+        IncreaseHP();
     }
 
     void Update()
@@ -34,5 +41,10 @@ public class EnemyScript : MonoBehaviour
     {
         player.GetComponent<PlayerScript>().AddScore(value);
         Destroy(gameObject);
+    }
+
+    void IncreaseHP()
+    {
+        manager.health += spawner.HPIncrease;
     }
 }

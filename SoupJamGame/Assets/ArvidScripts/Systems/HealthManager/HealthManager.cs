@@ -8,7 +8,7 @@ public class HealthManager : MonoBehaviour
         None, Slider, Transform
     }
 
-    [SerializeField] private float health;
+    [SerializeField] public float health;
     private float maxHealth;
 
     [Header("Settings")]
