@@ -11,7 +11,7 @@ public class EnemyScript : MonoBehaviour
 
     float speed = 1f;
 
-    float HP;
+    float value = 10;
 
     private void Start()
     {
@@ -32,6 +32,7 @@ public class EnemyScript : MonoBehaviour
 
     public void CommitDie()
     {
+        player.GetComponent<PlayerScript>().AddScore(value);
         Destroy(gameObject);
     }
 }

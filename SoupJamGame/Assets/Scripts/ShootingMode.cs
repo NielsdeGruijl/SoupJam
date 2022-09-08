@@ -87,7 +87,7 @@ public class ShootingMode : MonoBehaviour
     {
         bulletDamage = 2;
         bulletSpeed = 15f;
-        fireRate = 0.5f;
+        fireRate = 0.3f;
         projectile = bulletPrefab;
     }
 
@@ -114,6 +114,10 @@ public class ShootingMode : MonoBehaviour
         print("Time until next weapon mode: " + switchTimer);
         yield return new WaitForSeconds(switchTimer);
         currentMode = GunModeChance.GetRandomEntry();
+
+        if(!canShoot)
+            Shoot();
+
         print("Current weapon mode: " + currentMode);
         modeswitched = true;
     }
@@ -122,28 +126,32 @@ public class ShootingMode : MonoBehaviour
     {
         canShoot = false;
 
-        GameObject bullet = Instantiate(projectile, transform.position, transform.rotation);
-
         dir.Normalize();
+
+        GameObject bullet;
 
         switch (currentMode)
         {
             case Gunmode.SemiAuto:
+                bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
                 break;
             case Gunmode.Inverted:
-                bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed;
+                bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
+                bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed * -1f;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
                 break;
             case Gunmode.Rifle:
+                bullet = Instantiate(bulletPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(dir.x + Random.Range(-0.05f, 0.05f), dir.y + Random.Range(-0.05f, 0.05f)).normalized * bulletSpeed;
                 bullet.GetComponent<BulletScript>().damage = bulletDamage;
                 break;
             case Gunmode.Launcher:
+                bullet = Instantiate(rocketPrefab, transform.position, transform.rotation);
                 bullet.GetComponent<Rigidbody2D>().velocity = dir * bulletSpeed;
                 bullet.GetComponent<RocketScript>().damage = bulletDamage;
-                print("bullet dir: " + dir + " bulletSpeed: " + bulletSpeed);
+                //print("bullet dir: " + dir + " bulletSpeed: " + bulletSpeed);
                 break;
         }
 
