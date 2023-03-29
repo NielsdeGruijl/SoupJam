@@ -39,6 +39,7 @@ public class EnemyScript : MonoBehaviour
 
     public void CommitDie()
     {
+        CameraShake.instance.Shake(0.5f);
         player.GetComponent<PlayerScript>().AddScore(value);
         Destroy(gameObject);
     }
